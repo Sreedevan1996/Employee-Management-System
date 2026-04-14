@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}Home | Employee Management System{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div class="card">
+        <h1>Employee Management System</h1>
+        <p>
+            A secure web application for managing employees, departments, user roles,
+            and audit activity.
+        </p>
+
+        {% if not current_user.is_authenticated %}
+            <div class="actions">
+                <a href="{{ url_for('auth.login') }}" class="btn btn-primary">Login</a>
+            </div>
+        {% else %}
+            <div class="actions">
+                {% if current_user.role == 'admin' %}
+                    <a href="{{ url_for('admin.dashboard') }}" class="btn btn-primary">Go to Admin Dashboard</a>
+                {% else %}
+                    <a href="{{ url_for('profile.dashboard') }}" class="btn btn-primary">Go to Employee Dashboard</a>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}
