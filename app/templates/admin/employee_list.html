@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+
+{% block title %}Employees | Employee Management System{% endblock %}
+
+{% block content %}
+<section class="page-header page-header-flex">
+    <div>
+        <h1>Employees</h1>
+        <p>View, search, create, update, and delete employee records.</p>
+    </div>
+    <div>
+        <a href="{{ url_for('employee.create_employee') }}" class="btn btn-primary">Add Employee</a>
+    </div>
+</section>
+
+<section class="card">
+    <h2>Search & Filter</h2>
+    <form method="GET" action="{{ url_for('employee.list_employees') }}" class="filter-form">
+        <div class="form-row">
+            <div class="form-group">
+                <label for="search">Search</label>
+                <input
+                    type="text"
+                    id="search"
+                    name="search"
+                    class="form-control"
+                    value="{{ filters.search or '' }}"
+                    placeholder="Name, code, email, job title"
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="department_id">Department</label>
+                <select name="department_id" id="department_id" class="form-control">
+                    <option value="">All Departments</option>
+                    {% for department in departments %}
+                        <option value="{{ department.id }}"
+                            {% if filters.department_id == department.id %}selected{% endif %}>
+                            {{ department.name }} ({{ department.code }})
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group checkbox-group">
+                <input
+                    type="checkbox"
+                    id="active_only"
+                    name="active_only"
+                    value="1"
+                    {% if filters.active_only %}checked{% endif %}
+                >
+                <label for="active_only">Active Only</label>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Apply Filters</button>
+            <a href="{{ url_for('employee.list_employees') }}" class="btn btn-secondary">Reset</a>
+        </div>
+    </form>
+</section>
+
+<section class="card">
+    <h2>Employee Records</h2>
+
+    {% if employees %}
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Job Title</th>
+                        <th>Department</th>
+                        <th>Status</th>
+                        <th class="actions-col">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for employee in employees %}
+                        <tr>
+                            <td>{{ employee.employee_code }}</td>
+                            <td>{{ employee.full_name }}</td>
+                            <td>{{ employee.email }}</td>
+                            <td>{{ employee.job_title }}</td>
+                            <td>
+                                {% if employee.department %}
+                                    {{ employee.department.name }}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if employee.is_active %}
+                                    <span class="badge badge-success">Active</span>
+                                {% else %}
+                                    <span class="badge badge-danger">Inactive</span>
+                                {% endif %}
+                            </td>
+                            <td class="table-actions">
+                                <a href="{{ url_for('employee.view_employee', employee_id=employee.id) }}" class="btn btn-sm btn-secondary">View</a>
+                                <a href="{{ url_for('employee.edit_employee', employee_id=employee.id) }}" class="btn btn-sm btn-primary">Edit</a>
+                                <form method="POST" action="{{ url_for('employee.delete_employee', employee_id=employee.id) }}" class="inline-form">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Delete this employee?');">
+                                        Delete
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p>No employees found.</p>
+    {% endif %}
+</section>
+{% endblock %}

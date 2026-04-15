@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block title %}Audit Logs | Employee Management System{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <h1>Audit Logs</h1>
+    <p>Review security-related activity and application events.</p>
+</section>
+
+<section class="card">
+    <h2>Filter Logs</h2>
+    <form method="GET" action="{{ url_for('admin.audit_logs') }}" class="filter-form">
+        <div class="form-row">
+            <div class="form-group">
+                <label for="user_id">User ID</label>
+                <input
+                    type="number"
+                    id="user_id"
+                    name="user_id"
+                    class="form-control"
+                    value="{{ filters.user_id or '' }}"
+                    min="1"
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="action">Action</label>
+                <input
+                    type="text"
+                    id="action"
+                    name="action"
+                    class="form-control"
+                    value="{{ filters.action or '' }}"
+                    placeholder="e.g. LOGIN_SUCCESS"
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="status">Status</label>
+                <select id="status" name="status" class="form-control">
+                    <option value="">All</option>
+                    <option value="SUCCESS" {% if filters.status == 'SUCCESS' %}selected{% endif %}>SUCCESS</option>
+                    <option value="FAILED" {% if filters.status == 'FAILED' %}selected{% endif %}>FAILED</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Apply Filters</button>
+            <a href="{{ url_for('admin.audit_logs') }}" class="btn btn-secondary">Reset</a>
+        </div>
+    </form>
+</section>
+
+<section class="card">
+    <h2>Audit Entries</h2>
+
+    {% if logs %}
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Time</th>
+                        <th>Action</th>
+                        <th>Status</th>
+                        <th>User ID</th>
+                        <th>Entity</th>
+                        <th>IP Address</th>
+                        <th>Details</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for log in logs %}
+                        <tr>
+                            <td>{{ log.created_at.strftime('%Y-%m-%d %H:%M:%S') if log.created_at else '-' }}</td>
+                            <td>{{ log.action }}</td>
+                            <td>
+                                {% if log.status == 'SUCCESS' %}
+                                    <span class="badge badge-success">{{ log.status }}</span>
+                                {% else %}
+                                    <span class="badge badge-danger">{{ log.status }}</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ log.user_id or '-' }}</td>
+                            <td>
+                                {{ log.entity_type or '-' }}
+                                {% if log.entity_id %}
+                                    #{{ log.entity_id }}
+                                {% endif %}
+                            </td>
+                            <td>{{ log.ip_address or '-' }}</td>
+                            <td>{{ log.details or '-' }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p>No audit log entries found.</p>
+    {% endif %}
+</section>
+{% endblock %}

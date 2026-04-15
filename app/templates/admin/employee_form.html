@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+
+{% if view_only %}
+    {% set page_heading = "Employee Details" %}
+{% else %}
+    {% set page_heading = page_title or "Employee Form" %}
+{% endif %}
+
+{% block title %}{{ page_heading }} | Employee Management System{% endblock %}
+
+{% block content %}
+<section class="page-header page-header-flex">
+    <div>
+        <h1>{{ page_heading }}</h1>
+        {% if employee %}
+            <p>Employee record for {{ employee.full_name }}</p>
+        {% else %}
+            <p>Create or update employee details.</p>
+        {% endif %}
+    </div>
+    <div>
+        <a href="{{ url_for('employee.list_employees') }}" class="btn btn-secondary">Back to Employees</a>
+    </div>
+</section>
+
+{% if view_only and employee %}
+    <section class="card">
+        <div class="details-grid">
+            <div><strong>Employee Code:</strong> {{ employee.employee_code }}</div>
+            <div><strong>Full Name:</strong> {{ employee.full_name }}</div>
+            <div><strong>Email:</strong> {{ employee.email }}</div>
+            <div><strong>Phone:</strong> {{ employee.phone or '-' }}</div>
+            <div><strong>Job Title:</strong> {{ employee.job_title }}</div>
+            <div>
+                <strong>Department:</strong>
+                {{ employee.department.name if employee.department else '-' }}
+            </div>
+            <div><strong>Address:</strong> {{ employee.address or '-' }}</div>
+            <div><strong>Salary:</strong> {{ employee.salary or '-' }}</div>
+            <div><strong>Date Joined:</strong> {{ employee.date_joined or '-' }}</div>
+            <div>
+                <strong>Status:</strong>
+                {% if employee.is_active %}
+                    Active
+                {% else %}
+                    Inactive
+                {% endif %}
+            </div>
+            <div>
+                <strong>Linked User:</strong>
+                {{ employee.user_account.username if employee.user_account else '-' }}
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <a href="{{ url_for('employee.edit_employee', employee_id=employee.id) }}" class="btn btn-primary">Edit</a>
+            <form method="POST" action="{{ url_for('employee.delete_employee', employee_id=employee.id) }}" class="inline-form">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="btn btn-danger" onclick="return confirm('Delete this employee?');">
+                    Delete
+                </button>
+            </form>
+        </div>
+    </section>
+{% else %}
+    <section class="card">
+        <form method="POST" novalidate>
+            {{ form.hidden_tag() }}
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="{{ form.employee_code.id }}">{{ form.employee_code.label.text }}</label>
+                    {{ form.employee_code(class="form-control") }}
+                    {% for error in form.employee_code.errors %}
+                        <small class="error-text">{{ error }}</small>
+                    {% endfor %}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.email.id }}">{{ form.email.label.text }}</label>
+                    {{ form.email(class="form-control") }}
+                    {% for error in form.email.errors %}
+                        <small class="error-text">{{ error }}</small>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="{{ form.first_name.id }}">{{ form.first_name.label.text }}</label>
+                    {{ form.first_name(class="form-control") }}
+                    {% for error in form.first_name.errors %}
+                        <small class="error-text">{{ error }}</small>
+                    {% endfor %}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.last_name.id }}">{{ form.last_name.label.text }}</label>
+                    {{ form.last_name(class="form-control") }}
+                    {% for error in form.last_name.errors %}
+                        <small class="error-text">{{ error }}</small>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="{{ form.phone.id }}">{{ form.phone.label.text }}</label>
+                    {{ form.phone(class="form-control") }}
+                    {% for error in form.phone.errors %}
+                        <small class="error-text">{{ error }}</small>
+                    {% endfor %}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.job_title.id }}">{{ form.job_title.label.text }}</label>
+                    {{ form.job_title(class="form-control") }}
+                    {% for error in form.job_title.errors %}
+                        <small class="error-text">{{ error }}</small>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.address.id }}">{{ form.address.label.text }}</label>
+                {{ form.address(class="form-control") }}
+                {% for error in form.address.errors %}
+                    <small class="error-text">{{ error }}</small>
+                {% endfor %}
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="{{ form.salary.id }}">{{ form.salary.label.text }}</label>
+                    {{ form.salary(class="form-control") }}
+                    {% for error in form.salary.errors %}
+                        <small class="error-text">{{ error }}</small>
+                    {% endfor %}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.date_joined.id }}">{{ form.date_joined.label.text }}</label>
+                    {{ form.date_joined(class="form-control") }}
+                    {% for error in form.date_joined.errors %}
+                        <small class="error-text">{{ error }}</small>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="{{ form.department_id.id }}">{{ form.department_id.label.text }}</label>
+                    {{ form.department_id(class="form-control") }}
+                    {% for error in form.department_id.errors %}
+                        <small class="error-text">{{ error }}</small>
+                    {% endfor %}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.user_id.id }}">{{ form.user_id.label.text }}</label>
+                    {{ form.user_id(class="form-control") }}
+                    {% for error in form.user_id.errors %}
+                        <small class="error-text">{{ error }}</small>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="form-group checkbox-group">
+                {{ form.is_active() }}
+                <label for="{{ form.is_active.id }}">{{ form.is_active.label.text }}</label>
+            </div>
+
+            <div class="form-actions">
+                {{ form.submit(class="btn btn-primary", value=submit_label or "Save") }}
+                <a href="{{ url_for('employee.list_employees') }}" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </section>
+{% endif %}
+{% endblock %}

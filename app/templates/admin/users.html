@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+
+{% block title %}Users | Employee Management System{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <h1>User Management</h1>
+    <p>Create user accounts, manage status, and reset passwords.</p>
+</section>
+
+<section class="card">
+    <h2>Create User</h2>
+    <form method="POST" action="{{ url_for('admin.users') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" class="form-control" id="username" name="username" required maxlength="50">
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" class="form-control" id="email" name="email" required maxlength="120">
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" class="form-control" id="password" name="password" required minlength="8">
+            </div>
+
+            <div class="form-group">
+                <label for="role">Role</label>
+                <select class="form-control" id="role" name="role" required>
+                    <option value="employee">Employee</option>
+                    <option value="admin">Admin</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Create User</button>
+        </div>
+    </form>
+</section>
+
+<section class="card">
+    <h2>Filter Users</h2>
+    <form method="GET" action="{{ url_for('admin.users') }}" class="filter-form">
+        <div class="form-row">
+            <div class="form-group">
+                <label for="role_filter">Role</label>
+                <select id="role_filter" name="role" class="form-control">
+                    <option value="">All Roles</option>
+                    <option value="employee" {% if selected_role == 'employee' %}selected{% endif %}>Employee</option>
+                    <option value="admin" {% if selected_role == 'admin' %}selected{% endif %}>Admin</option>
+                </select>
+            </div>
+
+            <div class="form-group checkbox-group">
+                <input type="checkbox" id="active_only" name="active_only" value="1" {% if active_only %}checked{% endif %}>
+                <label for="active_only">Active Only</label>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Apply Filter</button>
+            <a href="{{ url_for('admin.users') }}" class="btn btn-secondary">Reset</a>
+        </div>
+    </form>
+</section>
+
+<section class="card">
+    <h2>User Accounts</h2>
+
+    {% if users %}
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Status</th>
+                        <th>Last Login</th>
+                        <th>Toggle Status</th>
+                        <th>Reset Password</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                        <tr>
+                            <td>{{ user.username }}</td>
+                            <td>{{ user.email }}</td>
+                            <td>{{ user.role|capitalize }}</td>
+                            <td>
+                                {% if user.is_active %}
+                                    <span class="badge badge-success">Active</span>
+                                {% else %}
+                                    <span class="badge badge-danger">Inactive</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {{ user.last_login_at.strftime('%Y-%m-%d %H:%M') if user.last_login_at else '-' }}
+                            </td>
+                            <td>
+                                <form method="POST" action="{{ url_for('admin.toggle_user_active', user_id=user.id) }}">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <button type="submit" class="btn btn-sm btn-secondary">
+                                        {% if user.is_active %}Deactivate{% else %}Activate{% endif %}
+                                    </button>
+                                </form>
+                            </td>
+                            <td>
+                                <form method="POST" action="{{ url_for('admin.reset_user_password', user_id=user.id) }}" class="inline-password-form">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <input
+                                        type="password"
+                                        name="new_password"
+                                        class="form-control form-control-sm"
+                                        placeholder="New password"
+                                        minlength="8"
+                                        required
+                                    >
+                                    <button type="submit" class="btn btn-sm btn-danger">Reset</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p>No users found.</p>
+    {% endif %}
+</section>
+{% endblock %}

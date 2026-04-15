@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard | Employee Management System{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <h1>Admin Dashboard</h1>
+    <p>Overview of users, employees, departments, and recent audit activity.</p>
+</section>
+
+<section class="stats-grid">
+    <div class="card stat-card">
+        <h3>Total Users</h3>
+        <p class="stat-number">{{ stats.user_count }}</p>
+    </div>
+    <div class="card stat-card">
+        <h3>Total Employees</h3>
+        <p class="stat-number">{{ stats.employee_count }}</p>
+    </div>
+    <div class="card stat-card">
+        <h3>Total Departments</h3>
+        <p class="stat-number">{{ stats.department_count }}</p>
+    </div>
+</section>
+
+<section class="card">
+    <h2>Quick Links</h2>
+    <div class="actions">
+        <a href="{{ url_for('employee.list_employees') }}" class="btn btn-primary">Manage Employees</a>
+        <a href="{{ url_for('admin.department_list') }}" class="btn btn-secondary">Manage Departments</a>
+        <a href="{{ url_for('admin.users') }}" class="btn btn-secondary">Manage Users</a>
+        <a href="{{ url_for('admin.audit_logs') }}" class="btn btn-secondary">View Audit Logs</a>
+    </div>
+</section>
+
+<section class="card">
+    <h2>Recent Audit Activity</h2>
+    {% if stats.recent_logs %}
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Time</th>
+                        <th>Action</th>
+                        <th>Status</th>
+                        <th>User ID</th>
+                        <th>Entity</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for log in stats.recent_logs %}
+                        <tr>
+                            <td>{{ log.created_at.strftime('%Y-%m-%d %H:%M') if log.created_at else '-' }}</td>
+                            <td>{{ log.action }}</td>
+                            <td>{{ log.status }}</td>
+                            <td>{{ log.user_id or '-' }}</td>
+                            <td>
+                                {{ log.entity_type or '-' }}
+                                {% if log.entity_id %}
+                                    #{{ log.entity_id }}
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p>No recent audit activity found.</p>
+    {% endif %}
+</section>
+{% endblock %}

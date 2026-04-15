@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}Departments | Employee Management System{% endblock %}
+
+{% block content %}
+<section class="page-header page-header-flex">
+    <div>
+        <h1>Departments</h1>
+        <p>Manage department records and organizational structure.</p>
+    </div>
+    <div>
+        <a href="{{ url_for('admin.create_department') }}" class="btn btn-primary">Add Department</a>
+    </div>
+</section>
+
+<section class="card">
+    {% if departments %}
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Code</th>
+                        <th>Manager</th>
+                        <th>Employees</th>
+                        <th>Status</th>
+                        <th class="actions-col">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for department in departments %}
+                        <tr>
+                            <td>{{ department.name }}</td>
+                            <td>{{ department.code }}</td>
+                            <td>{{ department.manager_name or '-' }}</td>
+                            <td>{{ department.employee_count }}</td>
+                            <td>
+                                {% if department.is_active %}
+                                    <span class="badge badge-success">Active</span>
+                                {% else %}
+                                    <span class="badge badge-danger">Inactive</span>
+                                {% endif %}
+                            </td>
+                            <td class="table-actions">
+                                <a href="{{ url_for('admin.edit_department', department_id=department.id) }}" class="btn btn-sm btn-primary">Edit</a>
+                                <form method="POST" action="{{ url_for('admin.delete_department', department_id=department.id) }}" class="inline-form">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Delete this department?');">
+                                        Delete
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p>No departments found.</p>
+    {% endif %}
+</section>
+{% endblock %}
