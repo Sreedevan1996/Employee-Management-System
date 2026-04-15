@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}My Profile | Employee Management System{% endblock %}
+
+{% block content %}
+<section class="page-header page-header-flex">
+    <div>
+        <h1>My Profile</h1>
+        <p>View your employee profile details.</p>
+    </div>
+    <div>
+        <a href="{{ url_for('profile.edit_profile') }}" class="btn btn-primary">Edit Profile</a>
+    </div>
+</section>
+
+<section class="card">
+    <div class="details-grid">
+        <div><strong>Employee Code:</strong> {{ employee.employee_code }}</div>
+        <div><strong>Full Name:</strong> {{ employee.full_name }}</div>
+        <div><strong>Email:</strong> {{ employee.email }}</div>
+        <div><strong>Phone:</strong> {{ employee.phone or '-' }}</div>
+        <div><strong>Department:</strong> {{ employee.department.name if employee.department else '-' }}</div>
+        <div><strong>Job Title:</strong> {{ employee.job_title }}</div>
+        <div><strong>Address:</strong> {{ employee.address or '-' }}</div>
+        <div><strong>Date Joined:</strong> {{ employee.date_joined or '-' }}</div>
+        <div><strong>Status:</strong> {{ 'Active' if employee.is_active else 'Inactive' }}</div>
+    </div>
+</section>
+{% endblock %}

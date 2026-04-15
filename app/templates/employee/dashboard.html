@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}Employee Dashboard | Employee Management System{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <h1>Employee Dashboard</h1>
+    <p>Welcome, {{ employee.full_name }}.</p>
+</section>
+
+<section class="stats-grid">
+    <div class="card stat-card">
+        <h3>Employee Code</h3>
+        <p class="stat-number">{{ employee.employee_code }}</p>
+    </div>
+
+    <div class="card stat-card">
+        <h3>Department</h3>
+        <p class="stat-number">
+            {{ employee.department.name if employee.department else '-' }}
+        </p>
+    </div>
+
+    <div class="card stat-card">
+        <h3>Job Title</h3>
+        <p class="stat-number">{{ employee.job_title }}</p>
+    </div>
+</section>
+
+<section class="card">
+    <h2>Quick Actions</h2>
+    <div class="actions">
+        <a href="{{ url_for('profile.view_profile') }}" class="btn btn-primary">View Profile</a>
+        <a href="{{ url_for('profile.edit_profile') }}" class="btn btn-secondary">Edit Profile</a>
+    </div>
+</section>
+{% endblock %}
